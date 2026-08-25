@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,6 +27,6 @@ public class UserCreateRequestDTO {
     @NotBlank(message = "La contraseña es obligatorio.")
     @Size(min = 3, max = 100, message = "El nombre debe tener entre 3 y 100 caracteres")
     private String password;
-    @NotBlank(message = "El Rol es obligatorio.")
-    private Rol rol;
+    @NotBlank(message = "El ID del plan es obligatorio.")
+    private UUID planPublicId;
 }
