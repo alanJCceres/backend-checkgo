@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "user")
+@Table(name = "\"user\"")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -35,7 +35,7 @@ public class User {
     @Column(name= "rol", nullable = false)
     private Rol rol;
     @Column(name= "active", nullable = false)
-    private boolean active;
+    private boolean active = true;
     @Column(name= "imei", nullable = true)
     private String imei;
     @Column(name= "first_time_login", nullable = false)
