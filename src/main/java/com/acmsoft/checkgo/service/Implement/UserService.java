@@ -7,6 +7,7 @@ import com.acmsoft.checkgo.mapper.UserMapper;
 import com.acmsoft.checkgo.repository.UserRepository;
 import com.acmsoft.checkgo.service.IUserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,9 +16,11 @@ public class UserService implements IUserService {
 
     private final UserRepository userRepository;
     private final PlanService planService;
+    private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     public User saveUser(UserCreateRequestDTO userRequest){
-        Plan plan = planService.getPlan(userRequest.getPlanPublicId());
-        return userRepository.save(userMapper.toUser(userRequest, plan));
+        User newUser = userMapper.toUser(userRequest, planService.getPlan(userRequest.getPlanPublicId()));
+        newUser.setUserPassword(passwordEncoder.encode(newUser.getUserPassword()));
+        return userRepository.save(newUser);
     }
 }
