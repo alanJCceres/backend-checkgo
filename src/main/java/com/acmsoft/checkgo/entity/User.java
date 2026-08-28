@@ -35,7 +35,7 @@ public class User {
     @Column(name= "rol", nullable = false)
     private Rol rol;
     @Column(name= "active", nullable = false)
-    private boolean active = true;
+    private boolean active;
     @Column(name= "imei", nullable = true)
     private String imei;
     @Column(name= "first_time_login", nullable = false)
