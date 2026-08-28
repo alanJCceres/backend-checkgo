@@ -5,5 +5,5 @@ import com.acmsoft.checkgo.entity.Plan;
 import java.util.UUID;
 
 public interface IPlanService {
-    Plan getPlan(UUID publicId);
+    Plan findPlanByPublicId(UUID publicId);
 }

@@ -21,7 +21,7 @@ public class UserCreateRequestDTO {
     @Size(min = 3, max = 100, message = "El nombre debe tener entre 3 y 100 caracteres")
     private String fullname;
     @Email
-    private String email;
+    private String email; //opcional para USER, obligatorio para SUPER ADMIN
     @NotBlank(message = "El nombre de usuario es obligatorio.")
     @Size(min = 3, max = 100, message = "El nombre debe tener entre 3 y 100 caracteres")
     private String userName;
@@ -30,6 +30,6 @@ public class UserCreateRequestDTO {
     private String password;
     @NotNull(message = "El rol es obligatorio.")
     private Rol rol;
-    @NotNull(message = "El ID del plan es obligatorio.")
-    private UUID planPublicId;
+    private UUID planPublicId; //SOLO PARA SUPER ADMIN
+    private UUID createdBy; //SOLO PARA USER
 }

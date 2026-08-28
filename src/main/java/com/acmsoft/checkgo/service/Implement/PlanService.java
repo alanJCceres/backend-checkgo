@@ -14,8 +14,8 @@ import java.util.UUID;
 public class PlanService implements IPlanService {
 
     private final PlanRepository planRepository;
-    public Plan getPlan(UUID publicId){
+    public Plan findPlanByPublicId(UUID publicId){
         return planRepository.findByPublicId(publicId)
-                .orElseThrow(() -> new ResourceNotFoundException("El rol con ID " + publicId + " no existe."));
+                .orElseThrow(() -> new ResourceNotFoundException("El plan con ID " + publicId + " no existe."));
     }
 }
