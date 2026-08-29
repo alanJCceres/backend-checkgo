@@ -25,9 +25,9 @@ public class User {
     private UUID publicId;
     @Column(name= "fullname", nullable = false)
     private String fullname;
-    @Column(name= "user_name", nullable = false)
+    @Column(name= "user_name", unique = true, nullable = false)
     private String userName;
-    @Column(name= "email", nullable = true)
+    @Column(name= "email", unique = true, nullable = true)
     private String email;
     @Column(name= "user_password", nullable = false)
     private String userPassword;
@@ -36,7 +36,7 @@ public class User {
     private Rol rol;
     @Column(name= "active", nullable = false)
     private boolean active;
-    @Column(name= "imei", nullable = true)
+    @Column(name= "imei", unique = true, nullable = true)
     private String imei;
     @Column(name= "first_time_login", nullable = false)
     private boolean firstTimeLogin;
