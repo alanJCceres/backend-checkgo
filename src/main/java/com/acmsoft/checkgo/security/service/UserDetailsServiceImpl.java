@@ -12,15 +12,23 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
 
-    public UserDetails loadUserByUsername(String username){
-        User getUser = userRepository.findByUserName(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
+    @Override
+    public UserDetails loadUserByUsername(String publicId){
+        UUID uuid;
+        try {
+            uuid = UUID.fromString(publicId);
+        } catch (IllegalArgumentException e) {
+            throw new UsernameNotFoundException("Formato de publicId inválido: " + publicId);
+        }
+        User getUser = userRepository.findByPublicId(uuid)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + uuid));
 
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority(getUser.getRol().toString());
         return new CustomUserDetails(

@@ -77,8 +77,9 @@ public class JwtService {
 
     //Verifica si el token es valido
     public boolean isTokenValid(String token){
+
         try{
-            return !isTokenValid(token);
+            return !isTokenExpired(token);
         }catch (JwtException | IllegalArgumentException e){
             return false;
         }

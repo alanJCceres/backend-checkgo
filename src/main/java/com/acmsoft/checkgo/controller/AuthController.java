@@ -1,6 +1,7 @@
 package com.acmsoft.checkgo.controller;
 
 import com.acmsoft.checkgo.dto.request.LoginRequestDTO;
+import com.acmsoft.checkgo.dto.request.RefreshTokenRequestDTO;
 import com.acmsoft.checkgo.dto.request.UserCreateRequestDTO;
 import com.acmsoft.checkgo.dto.response.JwtResponseDTO;
 import com.acmsoft.checkgo.entity.User;
@@ -33,6 +34,11 @@ public class AuthController {
         User newUser = authService.registerUser(userCreateRequestDTO);
         URI uri = uriBuilder.path("/api/v1/User/{id}").buildAndExpand(newUser.getPublicId()).toUri();
         return ResponseEntity.created(uri).build();
+    }
+
+    @PostMapping("/refresh_token")
+    public ResponseEntity<JwtResponseDTO> refreshToken(@Valid @RequestBody RefreshTokenRequestDTO request) {
+        return ResponseEntity.ok(authService.refreshToken(request.getRefreshToken()));
     }
 }
 

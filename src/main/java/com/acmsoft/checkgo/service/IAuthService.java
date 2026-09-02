@@ -8,4 +8,5 @@ import com.acmsoft.checkgo.entity.User;
 public interface IAuthService {
     User registerUser(UserCreateRequestDTO requestUser);
     JwtResponseDTO authenticate(LoginRequestDTO loginRequest);
+    JwtResponseDTO refreshToken(String refreshToken);
 }
