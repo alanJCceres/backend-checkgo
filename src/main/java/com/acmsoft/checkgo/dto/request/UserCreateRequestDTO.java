@@ -17,16 +17,16 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class UserCreateRequestDTO {
-    @NotBlank(message = "El nombre es obligatorio.")
-    @Size(min = 3, max = 100, message = "El nombre debe tener entre 3 y 100 caracteres")
+    @NotBlank(message = "El nombre completo es obligatorio.")
+    @Size(min = 3, max = 100, message = "El nombre completo debe tener entre 3 y 100 caracteres")
     private String fullname;
     @Email
     private String email; //opcional para USER, obligatorio para SUPER ADMIN
     @NotBlank(message = "El nombre de usuario es obligatorio.")
-    @Size(min = 3, max = 100, message = "El nombre debe tener entre 3 y 100 caracteres")
+    @Size(min = 3, max = 20, message = "El nombre de usuario debe tener entre 3 y 20 caracteres")
     private String userName;
     @NotBlank(message = "La contraseña es obligatorio.")
-    @Size(min = 3, max = 100, message = "El nombre debe tener entre 3 y 100 caracteres")
+    @Size(min = 8, max = 20, message = "La contraseña debe tener entre 8 y 20 caracteres")
     private String password;
     @NotNull(message = "El rol es obligatorio.")
     private Rol rol;
