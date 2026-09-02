@@ -20,12 +20,4 @@ import java.net.URI;
 @RequestMapping("/api/v1/user")
 public class UserController {
     private final IUserService userService;
-
-    @PostMapping
-    @Transactional
-    public ResponseEntity<Void> createUser(@Valid @RequestBody UserCreateRequestDTO userCreateRequestDTO, UriComponentsBuilder uriBuilder){
-        User newUser = userService.saveUser(userCreateRequestDTO);
-        URI uri = uriBuilder.path("/api/v1/User/{id}").buildAndExpand(newUser.getPublicId()).toUri();
-        return ResponseEntity.created(uri).build();
-    }
 }

@@ -46,6 +46,7 @@ public class UserService implements IUserService {
         newUser.setUserPassword(passwordEncoder.encode(newUser.getUserPassword()));
         return userRepository.save(newUser);
     }
+
     private void validateUserCamposUnicos(String userName,String email){
         if (userRepository.existsByUserName(userName)) {
             throw new ResourceAlreadyExistsException(
