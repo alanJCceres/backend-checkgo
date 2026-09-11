@@ -63,7 +63,7 @@ public class AuthService implements IAuthService {
             throw new InvalidTokenException("Refresh token inválido");
         }
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(publicId);
+        UserDetails userDetails = userDetailsService.loadUserByPublicId(publicId);
         if (!jwtService.isTokenValid(refreshToken)) {
             throw new InvalidTokenException("Refresh token inválido o expirado");
         }

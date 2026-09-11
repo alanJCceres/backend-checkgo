@@ -20,21 +20,32 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String publicId){
-        UUID uuid;
-        try {
-            uuid = UUID.fromString(publicId);
-        } catch (IllegalArgumentException e) {
-            throw new UsernameNotFoundException("Formato de publicId inválido: " + publicId);
-        }
-        User getUser = userRepository.findByPublicId(uuid)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + uuid));
+    public UserDetails loadUserByUsername(String userName){
+        User getUser = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + userName));
 
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority(getUser.getRol().toString());
         return new CustomUserDetails(
                 getUser.getUserName(),
                 getUser.getUserPassword(),
                 getUser.getPublicId(),
+                Collections.singletonList(authority)
+        );
+    }
+    public UserDetails loadUserByPublicId(String publicId) {
+        UUID uuid;
+        try {
+            uuid = UUID.fromString(publicId);
+        } catch (IllegalArgumentException e) {
+            throw new UsernameNotFoundException("Formato de publicId inválido: " + publicId);
+        }
+        User user = userRepository.findByPublicId(uuid)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + uuid));
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRol().toString());
+        return new CustomUserDetails(
+                user.getUserName(),
+                user.getUserPassword(),
+                user.getPublicId(),
                 Collections.singletonList(authority)
         );
     }
