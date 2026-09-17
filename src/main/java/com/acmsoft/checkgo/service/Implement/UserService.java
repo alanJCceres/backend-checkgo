@@ -52,10 +52,12 @@ public class UserService implements IUserService {
             throw new ResourceAlreadyExistsException(
                     "El nombre de usuario: " + userName + " ya está en uso."
             );
-        }else if(userRepository.existsByEmail(email)){
-            throw new ResourceAlreadyExistsException(
-                    "El email: " + email + " ya está en uso."
-            );
+        }else if(email != null){
+            if(userRepository.existsByEmail(email)){
+                throw new ResourceAlreadyExistsException(
+                        "El email: " + email + " ya está en uso."
+                );
+            }
         }
     }
 }
