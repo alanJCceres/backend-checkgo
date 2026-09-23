@@ -71,6 +71,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequestException(
+            BadRequestException ex,
+            HttpServletRequest request) {
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity
+                .badRequest()
+                .body(errorResponse);
+    }
 
     // 2. SOBREESCRITURA DE EXCEPCIONES INTERNAS DE SPRING
     //metodo cuando falla en valid como notnull, notblank, etc

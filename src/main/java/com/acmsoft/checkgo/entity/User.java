@@ -36,8 +36,8 @@ public class User {
     private Rol rol;
     @Column(name= "active", nullable = false)
     private boolean active;
-    @Column(name= "imei", unique = true, nullable = true)
-    private String imei;
+    @Column(name= "android_id", unique = true, nullable = true)
+    private String androidId;
     @Column(name= "first_time_login", nullable = false)
     private boolean firstTimeLogin;
     @ManyToOne(fetch = FetchType.LAZY)
