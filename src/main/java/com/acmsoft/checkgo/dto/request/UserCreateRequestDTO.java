@@ -31,5 +31,4 @@ public class UserCreateRequestDTO {
     @NotNull(message = "El rol es obligatorio.")
     private Rol rol;
     private UUID planPublicId; //SOLO PARA SUPER ADMIN
-    private UUID createdBy; //SOLO PARA USER
 }

@@ -11,8 +11,12 @@ import com.acmsoft.checkgo.mapper.UserMapper;
 import com.acmsoft.checkgo.repository.UserRepository;
 import com.acmsoft.checkgo.service.IUserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -39,7 +43,14 @@ public class UserService implements IUserService {
         if(userRequest.getRol() == Rol.SUPER_ADMIN){
             assignedPlan = planService.findPlanByPublicId(userRequest.getPlanPublicId());
         }else {
-            createdBy = findUserByPublicId(userRequest.getCreatedBy());
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Para registrar un usuario se requiere el Access Token del administrador.");
+            }
+            String adminPublicIdString = authentication.getName();
+            UUID adminPublicId = UUID.fromString(adminPublicIdString);
+            createdBy = findUserByPublicId(adminPublicId);
         }
 
         User newUser = userMapper.toUser(userRequest,assignedPlan,createdBy);
@@ -68,17 +79,7 @@ public class UserService implements IUserService {
                         "El usuario admin debe tener un plan id asociado en planPublicId"
                 );
             }
-            if(userRequest.getCreatedBy() != null){
-                throw new BadRequestException(
-                        "El usuario admin no debe tener un admin id asociado en createdBy"
-                );
-            }
         }else{
-            if(userRequest.getCreatedBy() == null){
-                throw new BadRequestException(
-                        "El nuevo usuario debe tener un admin id asociado en createdBy"
-                );
-            }
             if(userRequest.getPlanPublicId() != null){
                 throw new BadRequestException(
                         "El nuevo usuario no debe tener un plan id asociado en planPublicId"
