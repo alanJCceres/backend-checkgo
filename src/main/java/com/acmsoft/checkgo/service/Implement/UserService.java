@@ -5,6 +5,7 @@ import com.acmsoft.checkgo.entity.Plan;
 import com.acmsoft.checkgo.entity.User;
 import com.acmsoft.checkgo.enums.Rol;
 import com.acmsoft.checkgo.exception.BadRequestException;
+import com.acmsoft.checkgo.exception.InvalidTokenException;
 import com.acmsoft.checkgo.exception.ResourceAlreadyExistsException;
 import com.acmsoft.checkgo.exception.ResourceNotFoundException;
 import com.acmsoft.checkgo.mapper.UserMapper;
@@ -46,7 +47,7 @@ public class UserService implements IUserService {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Para registrar un usuario se requiere el Access Token del administrador.");
+                throw new InvalidTokenException("Token invalido, expirado o peticion sin token.");
             }
             String adminPublicIdString = authentication.getName();
             UUID adminPublicId = UUID.fromString(adminPublicIdString);
