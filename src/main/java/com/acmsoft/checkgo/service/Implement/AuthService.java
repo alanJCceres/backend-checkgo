@@ -4,7 +4,10 @@ import com.acmsoft.checkgo.dto.request.LoginRequestDTO;
 import com.acmsoft.checkgo.dto.request.UserCreateRequestDTO;
 import com.acmsoft.checkgo.dto.response.JwtResponseDTO;
 import com.acmsoft.checkgo.entity.User;
+import com.acmsoft.checkgo.enums.Rol;
+import com.acmsoft.checkgo.exception.BadRequestException;
 import com.acmsoft.checkgo.exception.InvalidTokenException;
+import com.acmsoft.checkgo.security.CustomUserDetails;
 import com.acmsoft.checkgo.security.service.JwtService;
 import com.acmsoft.checkgo.security.service.UserDetailsServiceImpl;
 import com.acmsoft.checkgo.service.IAuthService;
@@ -19,6 +22,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +34,27 @@ public class AuthService implements IAuthService {
     private final UserDetailsServiceImpl userDetailsService;
 
     @Transactional
-    public User registerUser(UserCreateRequestDTO userRequest) {
-        return userService.saveUser(userRequest);
+    public User registerUser(UserCreateRequestDTO userRequest, CustomUserDetails userDetails) {
+        UUID publicId=null;
+        if(userDetails != null){
+            String role = userDetails.getAuthorities().stream()
+                    .findFirst()
+                    .map(GrantedAuthority::getAuthority)
+                    .orElse(null);
+            if(role.equals(Rol.USER.toString())){
+                throw new BadRequestException("Para registrar un User debe tener permisos de SUPER ADMIN.");
+            }
+            if(userRequest.getRol() == Rol.SUPER_ADMIN){
+                throw new BadRequestException("No se puede registrar un SUPER ADMIN con access token.");
+            }
+            publicId = userDetails.getPublicId();
+        }
+
+        if(userDetails == null && userRequest.getRol() == Rol.USER){
+            throw new BadRequestException("No se puede registrar un USER sin un access token.");
+        }
+
+        return userService.saveUser(userRequest,publicId);
     }
 
     public JwtResponseDTO authenticate(LoginRequestDTO loginRequest){
@@ -74,5 +98,13 @@ public class AuthService implements IAuthService {
                 .orElse("USER");
 
         return new JwtResponseDTO(newAccessToken,refreshToken,useRole);
+    }
+
+    public boolean getFirstTimeLoginUser(CustomUserDetails userDetails){
+        if(userDetails == null){
+            throw new InvalidTokenException("Access token invalido o expirado.");
+        }
+        UUID publicId = userDetails.getPublicId();
+        return userService.getFirstTimeLogin(publicId);
     }
 }

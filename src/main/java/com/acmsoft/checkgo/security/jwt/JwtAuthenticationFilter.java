@@ -1,6 +1,7 @@
 package com.acmsoft.checkgo.security.jwt;
 
 import com.acmsoft.checkgo.security.service.JwtService;
+import com.acmsoft.checkgo.security.service.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -20,7 +22,9 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-private final JwtService jwtService;
+    private final JwtService jwtService;
+    private final UserDetailsServiceImpl userDetailsService;
+
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -39,10 +43,11 @@ private final JwtService jwtService;
 
         if(jwtService.isTokenValid(jwt) && SecurityContextHolder.getContext().getAuthentication() == null){
             String publicId = jwtService.extractPublicUserId(jwt);
+            UserDetails userDetails = userDetailsService.loadUserByPublicId(publicId);
             List<SimpleGrantedAuthority> authorities = jwtService.extractRoles(jwt);
 
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    publicId,
+                    userDetails,
                     null,
                     authorities
             );

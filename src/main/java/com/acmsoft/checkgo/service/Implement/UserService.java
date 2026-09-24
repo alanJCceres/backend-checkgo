@@ -1,25 +1,20 @@
 package com.acmsoft.checkgo.service.Implement;
 
+import com.acmsoft.checkgo.dto.request.DeviceUpdateRequestDTO;
 import com.acmsoft.checkgo.dto.request.UserCreateRequestDTO;
 import com.acmsoft.checkgo.entity.Plan;
 import com.acmsoft.checkgo.entity.User;
 import com.acmsoft.checkgo.enums.Rol;
-import com.acmsoft.checkgo.exception.BadRequestException;
-import com.acmsoft.checkgo.exception.InvalidTokenException;
-import com.acmsoft.checkgo.exception.ResourceAlreadyExistsException;
-import com.acmsoft.checkgo.exception.ResourceNotFoundException;
+import com.acmsoft.checkgo.exception.*;
 import com.acmsoft.checkgo.mapper.UserMapper;
 import com.acmsoft.checkgo.repository.UserRepository;
+import com.acmsoft.checkgo.security.CustomUserDetails;
 import com.acmsoft.checkgo.service.IUserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -35,7 +30,8 @@ public class UserService implements IUserService {
         return userRepository.findByPublicId(publicId)
                 .orElseThrow(() -> new ResourceNotFoundException("El User con ID " + publicId + " no existe."));
     }
-    public User saveUser(UserCreateRequestDTO userRequest){
+
+    public User saveUser(UserCreateRequestDTO userRequest,UUID adminPublicId){
         User createdBy = null;
         Plan assignedPlan = null;
 
@@ -44,13 +40,6 @@ public class UserService implements IUserService {
         if(userRequest.getRol() == Rol.SUPER_ADMIN){
             assignedPlan = planService.findPlanByPublicId(userRequest.getPlanPublicId());
         }else {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-            if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
-                throw new InvalidTokenException("Token invalido, expirado o peticion sin token.");
-            }
-            String adminPublicIdString = authentication.getName();
-            UUID adminPublicId = UUID.fromString(adminPublicIdString);
             createdBy = findUserByPublicId(adminPublicId);
         }
 
@@ -59,6 +48,25 @@ public class UserService implements IUserService {
         newUser.setFirstTimeLogin(true);
         newUser.setUserPassword(passwordEncoder.encode(newUser.getUserPassword()));
         return userRepository.save(newUser);
+    }
+
+    public boolean getFirstTimeLogin(UUID publicIdUser){
+        User getUser = findUserByPublicId(publicIdUser);
+        return getUser.isFirstTimeLogin();
+    }
+
+    @Transactional
+    public void updateAndroidId(DeviceUpdateRequestDTO deviceRequest, CustomUserDetails userDetails){
+        if(userDetails == null){
+            throw new InvalidTokenException("Token invalido, expirado o no encontrado.");
+        }
+        User getUser = findUserByPublicId(userDetails.getPublicId());
+        if(getUser.isFirstTimeLogin()){
+            getUser.setAndroidId(deviceRequest.getAndroidId());
+            getUser.setFirstTimeLogin(false);
+        }else{
+            throw new BusinessRuleException("El usuario ya registro su inicio de sesión inicial. Esta acción no está permitida.");
+        }
     }
 
     private void validateUserCampos(UserCreateRequestDTO userRequest){
