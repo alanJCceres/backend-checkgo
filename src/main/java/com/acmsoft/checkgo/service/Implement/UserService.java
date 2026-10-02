@@ -2,6 +2,7 @@ package com.acmsoft.checkgo.service.Implement;
 
 import com.acmsoft.checkgo.dto.request.DeviceUpdateRequestDTO;
 import com.acmsoft.checkgo.dto.request.UserCreateRequestDTO;
+import com.acmsoft.checkgo.dto.request.UserUpdateCredentialsRequest;
 import com.acmsoft.checkgo.dto.response.UserResponseDTO;
 import com.acmsoft.checkgo.entity.Plan;
 import com.acmsoft.checkgo.entity.User;
@@ -70,10 +71,11 @@ public class UserService implements IUserService {
             throw new BusinessRuleException("El usuario ya registro su inicio de sesión inicial. Esta acción no está permitida.");
         }
     }
+
     public List<UserResponseDTO> getAllUsers(CustomUserDetails userDetails){
         UUID publicIdAdmin = null;
         if(userDetails == null){
-            throw new BadRequestException("No se puede listar los usuarios sin un access token.");
+            throw new BadRequestException("No se puede listar los usuarios sin un access token o con un token expirado/invalido.");
         }
         publicIdAdmin = userDetails.getPublicId();
         User superAdmin = findUserByPublicId(publicIdAdmin);
@@ -82,6 +84,34 @@ public class UserService implements IUserService {
         }
         List<User> getUsers = userRepository.findAllBySuperAdminPublicId(publicIdAdmin);
         return userMapper.toResponseList(getUsers);
+    }
+
+    @Transactional
+    public void updateCredentialsUser(UUID publicIdUser, UserUpdateCredentialsRequest userUpdate, CustomUserDetails userDetails){
+        User getUser = findUserByPublicId(publicIdUser);
+        if(userDetails == null){
+            throw new BadRequestException("No se puede listar los usuarios sin un access token o con un token expirado/invalido.");
+        }
+        UUID publicIdAdmin = userDetails.getPublicId();
+        User superAdmin = findUserByPublicId(publicIdAdmin);
+
+        if (superAdmin.getRol() != Rol.SUPER_ADMIN){
+            throw new BusinessRuleException("Este usuario no tiene permisos para acceder a la lista de usuarios.");
+        }
+
+        if (userUpdate.getUserName() != null && !userUpdate.getUserName().trim().isEmpty()) {
+            String newUserName = userUpdate.getUserName().trim();
+            if (!getUser.getUserName().equals(newUserName) && userRepository.existsByUserName(newUserName)) {
+                throw new ResourceAlreadyExistsException("El nombre de usuario ya está en uso");
+            }
+            getUser.setUserName(newUserName);
+        }
+
+        if (userUpdate.getPassword() != null && !userUpdate.getPassword().trim().isEmpty()) {
+            String encodedPassword = passwordEncoder.encode(userUpdate.getPassword().trim());
+            getUser.setUserPassword(encodedPassword);
+        }
+        getUser.setUpdatedBy(superAdmin);
     }
 
     private void validateUserCampos(UserCreateRequestDTO userRequest){
