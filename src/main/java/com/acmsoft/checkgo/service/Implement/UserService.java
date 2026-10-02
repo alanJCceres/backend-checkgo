@@ -2,6 +2,7 @@ package com.acmsoft.checkgo.service.Implement;
 
 import com.acmsoft.checkgo.dto.request.DeviceUpdateRequestDTO;
 import com.acmsoft.checkgo.dto.request.UserCreateRequestDTO;
+import com.acmsoft.checkgo.dto.response.UserResponseDTO;
 import com.acmsoft.checkgo.entity.Plan;
 import com.acmsoft.checkgo.entity.User;
 import com.acmsoft.checkgo.enums.Rol;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -67,6 +69,19 @@ public class UserService implements IUserService {
         }else{
             throw new BusinessRuleException("El usuario ya registro su inicio de sesión inicial. Esta acción no está permitida.");
         }
+    }
+    public List<UserResponseDTO> getAllUsers(CustomUserDetails userDetails){
+        UUID publicIdAdmin = null;
+        if(userDetails == null){
+            throw new BadRequestException("No se puede listar los usuarios sin un access token.");
+        }
+        publicIdAdmin = userDetails.getPublicId();
+        User superAdmin = findUserByPublicId(publicIdAdmin);
+        if (superAdmin.getRol() != Rol.SUPER_ADMIN){
+            throw new BusinessRuleException("Este usuario no tiene permisos para acceder a la lista de usuarios.");
+        }
+        List<User> getUsers = userRepository.findAllBySuperAdminPublicId(publicIdAdmin);
+        return userMapper.toResponseList(getUsers);
     }
 
     private void validateUserCampos(UserCreateRequestDTO userRequest){

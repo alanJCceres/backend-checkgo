@@ -2,9 +2,11 @@ package com.acmsoft.checkgo.service;
 
 import com.acmsoft.checkgo.dto.request.DeviceUpdateRequestDTO;
 import com.acmsoft.checkgo.dto.request.UserCreateRequestDTO;
+import com.acmsoft.checkgo.dto.response.UserResponseDTO;
 import com.acmsoft.checkgo.entity.User;
 import com.acmsoft.checkgo.security.CustomUserDetails;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface IUserService {
@@ -12,4 +14,5 @@ public interface IUserService {
     User findUserByPublicId(UUID publicId);
     boolean getFirstTimeLogin(UUID publicIdUser);
     void updateAndroidId(DeviceUpdateRequestDTO deviceUpdateRequestDTO, CustomUserDetails userDetails);
+    List<UserResponseDTO> getAllUsers(CustomUserDetails userDetails);
 }
