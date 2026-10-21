@@ -1,5 +1,6 @@
 package com.acmsoft.checkgo.security.config;
 
+import com.acmsoft.checkgo.security.CustomAuthenticationEntryPoint;
 import com.acmsoft.checkgo.security.jwt.JwtAuthenticationFilter;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,7 +30,9 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity http,
+                                           JwtAuthenticationFilter jwtAuthFilter,
+                                           CustomAuthenticationEntryPoint entryPoint) throws Exception{
         http
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session
@@ -51,7 +54,8 @@ public class SecurityConfig {
                     // Cualquier otra ruta requiere estar autenticado
                     .anyRequest().authenticated()
             )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(entryPoint)) //personaliza el error de expiracion de 403 a 401
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             .authenticationProvider(authenticationProvider());
         return http.build();
     }

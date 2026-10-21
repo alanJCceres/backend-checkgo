@@ -4,11 +4,13 @@ import com.acmsoft.checkgo.enums.Rol;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
+@DynamicUpdate //esta notacion hace que se generen consultas sql segun lo que se envie para modificar
 @Table(name = "\"user\"")
 @Getter
 @Setter
