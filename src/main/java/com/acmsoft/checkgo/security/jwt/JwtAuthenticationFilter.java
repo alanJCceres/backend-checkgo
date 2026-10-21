@@ -2,6 +2,8 @@ package com.acmsoft.checkgo.security.jwt;
 
 import com.acmsoft.checkgo.security.service.JwtService;
 import com.acmsoft.checkgo.security.service.UserDetailsServiceImpl;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,29 +33,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-
         final String authHeader = request.getHeader("Authorization");
 
-        if(authHeader == null || !authHeader.startsWith("Bearer ")){
-            filterChain.doFilter(request,response);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
             return;
         }
 
         final String jwt = authHeader.substring(7);
 
-        if(jwtService.isTokenValid(jwt) && SecurityContextHolder.getContext().getAuthentication() == null){
-            String publicId = jwtService.extractPublicUserId(jwt);
-            UserDetails userDetails = userDetailsService.loadUserByPublicId(publicId);
-            List<SimpleGrantedAuthority> authorities = jwtService.extractRoles(jwt);
+        try {
+            if (jwtService.isTokenValid(jwt) && SecurityContextHolder.getContext().getAuthentication() == null) {
+                String publicId = jwtService.extractPublicUserId(jwt);
+                UserDetails userDetails = userDetailsService.loadUserByPublicId(publicId);
+                List<SimpleGrantedAuthority> authorities = jwtService.extractRoles(jwt);
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    userDetails,
-                    null,
-                    authorities
-            );
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                UsernamePasswordAuthenticationToken authenticationToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
+        } catch (ExpiredJwtException e) {
+            SecurityContextHolder.clearContext();
+            request.setAttribute("auth_error", "TOKEN_EXPIRED");
+        } catch (JwtException | IllegalArgumentException e) {
+            SecurityContextHolder.clearContext();
+            request.setAttribute("auth_error", "TOKEN_INVALID");
         }
-        filterChain.doFilter(request,response);
+
+        filterChain.doFilter(request, response);
     }
 }
