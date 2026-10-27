@@ -6,6 +6,8 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -34,6 +36,8 @@ public class ArrivalLocationSchedule {
     private LocalTime endTime;
     @JoinColumn(name = "active", nullable = false)
     private boolean active;
+    @ManyToMany(mappedBy = "arrivalLocationSchedules")
+    private Set<ArrivalLocation> arrivalLocations = new HashSet<>();
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
