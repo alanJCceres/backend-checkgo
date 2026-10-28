@@ -19,17 +19,21 @@ public class ArrivalLocationRequestDTO {
     @NotBlank(message = "El nombre de la dirección es obligatorio.")
     @Size(min = 3, max = 255, message = "El nombre de la dirección debe tener entre 3 y 255 caracteres")
     private String address;
-    @NotBlank(message = "La latitud es obligatorio.")
-    private String latitude;
-    @NotBlank(message = "La longitud es obligatorio.")
-    private String logitude;
+    @NotNull(message = "La latitud es obligatorio.")
+    @DecimalMin("-90") @DecimalMax("90")
+    private Double latitude;
+    @NotNull(message = "La longitud es obligatorio")
+    @DecimalMin("-180") @DecimalMax("180")
+    private Double longitude;
     private boolean arrivalOnly;
     private boolean exitOnly;
     private boolean arrivalAndDeparture;
-    @Max(value = 30,message = "la tolerancia no debe ser mas de 30 minutos")
+    @Max(value = 30,message = "La tolerancia no debe ser mas de 30 minutos")
+    @Min(value= 0, message = "La tolerancia no puede ser negativo.")
     private int tolerance;
-    @NotBlank(message = "El radio de la ubicación es obligatorio.")
-    @Min(value= 1, message = "el radio debe ser minimo 1 metro.")
+    @NotNull(message = "El radio de la ubicación es obligatorio.")
+    @Min(value= 1, message = "El radio debe ser minimo 1 metro.")
+    @Max(value = 1000,message = "El radio no puede ser mas de 1000 metros.")
     private int radio;
     @NotEmpty(message = "Debe tener asignado al menos un horario.")
     private List<@NotBlank(message = "El horario no puede estar vacío.") String> locationSchedules;
