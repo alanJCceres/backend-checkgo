@@ -26,8 +26,8 @@ public class ArrivalLocationSchedule {
     @Generated
     private UUID publicId;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "arrival_location_id", nullable = false)
-    private ArrivalLocation arrivalLocation;
+    @JoinColumn(name = "created_by", nullable = false)
+    private User createdBy;
     @JoinColumn(name = "day", nullable = false)
     private String day;
     @Column(name = "start_time", nullable = true)
