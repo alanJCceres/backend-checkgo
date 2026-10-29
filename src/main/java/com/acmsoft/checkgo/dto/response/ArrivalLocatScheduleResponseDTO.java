@@ -14,7 +14,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @Builder
 public class ArrivalLocatScheduleResponseDTO {
-    @NotNull(message = "El día es obligatorio.")
+    private String publicId;
     private Day day;
     private LocalTime startTime; //no obligatorio
     private LocalTime endTime; //no obligatorio

@@ -14,6 +14,7 @@ public interface ArrivalLocationScheduleMapper {
     @Mapping(target = "startTime", source = "arrivalLocationSchedule.startTime")
     @Mapping(target = "endTime", source = "arrivalLocationSchedule.endTime")
     @Mapping(target = "active", source = "arrivalLocationSchedule.active")
+    @Mapping(target = "publicId", source = "arrivalLocationSchedule.publicId")
     ArrivalLocatScheduleResponseDTO toDTO(ArrivalLocationSchedule arrivalLocationSchedule);
 
     List<ArrivalLocatScheduleResponseDTO> toDTOList(List<ArrivalLocationSchedule> locationSchedules);
