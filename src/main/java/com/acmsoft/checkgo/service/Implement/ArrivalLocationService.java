@@ -6,7 +6,6 @@ import com.acmsoft.checkgo.entity.ArrivalLocationSchedule;
 import com.acmsoft.checkgo.entity.ArrivalLocationUser;
 import com.acmsoft.checkgo.entity.User;
 import com.acmsoft.checkgo.exception.BadRequestException;
-import com.acmsoft.checkgo.exception.BusinessRuleException;
 import com.acmsoft.checkgo.mapper.ArrivalLocationMapper;
 import com.acmsoft.checkgo.repository.ArrivalLocationRepository;
 import com.acmsoft.checkgo.repository.ArrivalLocationScheduleRepository;
@@ -14,6 +13,7 @@ import com.acmsoft.checkgo.repository.ArrivalLocationUserRepository;
 import com.acmsoft.checkgo.repository.UserRepository;
 import com.acmsoft.checkgo.security.CustomUserDetails;
 import com.acmsoft.checkgo.service.IArrivalLocationService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -34,6 +34,7 @@ public class ArrivalLocationService implements IArrivalLocationService {
     private final ArrivalLocationMapper arrivalLocationMapper;
     private final GeometryFactory geometryFactory;
 
+    @Transactional
     public ArrivalLocation saveArrivalLocation(ArrivalLocationRequestDTO arrivalLocationRequestDTO, CustomUserDetails userDetails){
 
         if(userDetails == null){
@@ -48,12 +49,22 @@ public class ArrivalLocationService implements IArrivalLocationService {
         double lng = arrivalLocationRequestDTO.getLongitude();
         arrivalLocation.setLocation(geometryFactory.createPoint(new Coordinate(lng,lat)));
 
+        //verificamos arrival only, etc.
+        int selectedOptions = 0;
+        if (arrivalLocation.isArrivalOnly()) selectedOptions++;
+        if (arrivalLocation.isExitOnly()) selectedOptions++;
+        if (arrivalLocation.isArrivalAndDeparture()) selectedOptions++;
+        if (selectedOptions != 1) {
+            throw new BadRequestException("Debe seleccionar exactamente un tipo de registro de asistencia, verifique arrivalOnly, exitOnly y arrivalAndDeparture.");
+        }
+
         //Guardamos los horarios seleccionados
         List<ArrivalLocationSchedule> schedules = arrivalLocationScheduleRepository.findAllByPublicIdIn(toUuids(arrivalLocationRequestDTO.getLocationSchedules()));
         if (schedules.size() != arrivalLocationRequestDTO.getLocationSchedules().size()) {
-            throw new IllegalArgumentException("Algún horario no existe");
+            throw new BadRequestException("Algún horario no existe o los datos enviados son incoherentes");
         }
         arrivalLocation.setArrivalLocationSchedules(new HashSet<>(schedules));
+        arrivalLocation.setActive(true);
 
         //Guardamos el objeto arrivalLocation para usar su id en la tabla de users manyToMany
         ArrivalLocation saved = arrivalLocationRepository.save(arrivalLocation);
@@ -62,7 +73,7 @@ public class ArrivalLocationService implements IArrivalLocationService {
         List<UUID> userIds = toUuids(arrivalLocationRequestDTO.getAssignedUsers()).stream().distinct().toList();
         List<User> users = userRepository.findAllByPublicIdsAndAdmin(userIds, publicIdAdmin);
         if (users.size() != userIds.size()) {
-            throw new BusinessRuleException("Uno o más usuarios no existen o no te pertenecen");
+            throw new BadRequestException("Uno o más usuarios no existen, no te pertenecen o son incoherentes");
         }
         List<ArrivalLocationUser> assignments = users.stream().map(u -> {
             ArrivalLocationUser alu = new ArrivalLocationUser();

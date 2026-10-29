@@ -78,10 +78,6 @@ public class UserService implements IUserService {
             throw new BadRequestException("No se puede listar los usuarios sin un access token o con un token expirado/invalido.");
         }
         publicIdAdmin = userDetails.getPublicId();
-        User superAdmin = findUserByPublicId(publicIdAdmin);
-        if (superAdmin.getRol() != Rol.SUPER_ADMIN){
-            throw new BusinessRuleException("Este usuario no tiene permisos para acceder a la lista de usuarios.");
-        }
         List<User> getUsers = userRepository.findAllBySuperAdminPublicId(publicIdAdmin);
         return userMapper.toResponseList(getUsers);
     }
@@ -92,12 +88,8 @@ public class UserService implements IUserService {
         if(userDetails == null){
             throw new BadRequestException("No se puede listar los usuarios sin un access token o con un token expirado/invalido.");
         }
-        UUID publicIdAdmin = userDetails.getPublicId();
-        User superAdmin = findUserByPublicId(publicIdAdmin);
 
-        if (superAdmin.getRol() != Rol.SUPER_ADMIN){
-            throw new BusinessRuleException("Este usuario no tiene permisos para acceder a la lista de usuarios.");
-        }
+        User superAdmin = findUserByPublicId(userDetails.getPublicId());
 
         if (userUpdate.getUserName() != null && !userUpdate.getUserName().trim().isEmpty()) {
             String newUserName = userUpdate.getUserName().trim();

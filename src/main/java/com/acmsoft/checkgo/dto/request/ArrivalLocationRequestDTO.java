@@ -25,9 +25,12 @@ public class ArrivalLocationRequestDTO {
     @NotNull(message = "La longitud es obligatorio")
     @DecimalMin("-180") @DecimalMax("180")
     private Double longitude;
-    private boolean arrivalOnly;
-    private boolean exitOnly;
-    private boolean arrivalAndDeparture;
+    @NotNull(message = "el campo arrival only es obligatorio.")
+    private Boolean arrivalOnly=false;
+    @NotNull(message = "el campo exit only es obligatorio.")
+    private Boolean exitOnly=false;
+    @NotNull(message = "el campo arrival and departure es obligatorio.")
+    private Boolean arrivalAndDeparture=false;
     @Max(value = 30,message = "La tolerancia no debe ser mas de 30 minutos")
     @Min(value= 0, message = "La tolerancia no puede ser negativo.")
     private int tolerance;
