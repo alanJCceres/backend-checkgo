@@ -11,4 +11,5 @@ import java.util.UUID;
 @Repository
 public interface ArrivalLocationScheduleRepository extends JpaRepository<ArrivalLocationSchedule,Long> {
     List<ArrivalLocationSchedule> findAllByPublicIdIn(Collection<UUID> publicIds);
+    List<ArrivalLocationSchedule> findAllByCreatedBy_publicId(UUID publicId);
 }

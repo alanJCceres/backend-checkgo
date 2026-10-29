@@ -3,9 +3,11 @@ package com.acmsoft.checkgo.controller;
 import com.acmsoft.checkgo.dto.request.ArrivalLocationRequestDTO;
 import com.acmsoft.checkgo.dto.request.UserCreateRequestDTO;
 import com.acmsoft.checkgo.dto.request.UserUpdateCredentialsRequest;
+import com.acmsoft.checkgo.dto.response.ArrivalLocatScheduleResponseDTO;
 import com.acmsoft.checkgo.dto.response.UserResponseDTO;
 import com.acmsoft.checkgo.entity.ArrivalLocation;
 import com.acmsoft.checkgo.security.CustomUserDetails;
+import com.acmsoft.checkgo.service.Implement.ArrivalLocationScheduleService;
 import com.acmsoft.checkgo.service.Implement.ArrivalLocationService;
 import com.acmsoft.checkgo.service.Implement.UserService;
 import jakarta.validation.Valid;
@@ -25,6 +27,7 @@ import java.util.UUID;
 public class SuperAdminController {
     private final UserService userService;
     private final ArrivalLocationService arrivalLocationService;
+    private final ArrivalLocationScheduleService arrivalLocationScheduleService;
 
     @GetMapping("/users")
     public ResponseEntity<List<UserResponseDTO>> getAllUsers(@AuthenticationPrincipal CustomUserDetails userDetails){
@@ -40,6 +43,7 @@ public class SuperAdminController {
 
         return ResponseEntity.noContent().build();
     }
+
     @PostMapping("/arrivalLocation")
     public ResponseEntity<Void> createArrivalLocation(@Valid @RequestBody ArrivalLocationRequestDTO arrivalLocationRequestDTO,
                                                       UriComponentsBuilder uriBuilder,
@@ -48,5 +52,9 @@ public class SuperAdminController {
         ArrivalLocation newArrivalLocation = arrivalLocationService.saveArrivalLocation(arrivalLocationRequestDTO,userDetails);
         URI uri = uriBuilder.path("/api/v1/super_admin/arrivalLocation/{id}").buildAndExpand(newArrivalLocation.getPublicId()).toUri();
         return ResponseEntity.created(uri).build();
+    }
+    @GetMapping("/arrivalLocation/schedules")
+    public ResponseEntity<List<ArrivalLocatScheduleResponseDTO>> getAllSchedules(@AuthenticationPrincipal CustomUserDetails userDetails){
+        return ResponseEntity.ok(arrivalLocationScheduleService.getAllSchedules(userDetails));
     }
 }

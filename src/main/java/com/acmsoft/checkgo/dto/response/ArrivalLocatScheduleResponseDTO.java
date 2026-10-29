@@ -1,4 +1,4 @@
-package com.acmsoft.checkgo.dto.request;
+package com.acmsoft.checkgo.dto.response;
 
 import com.acmsoft.checkgo.enums.Day;
 import jakarta.validation.constraints.NotNull;
@@ -13,10 +13,11 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ArrivalLocatScheduleReqDTO {
+public class ArrivalLocatScheduleResponseDTO {
     @NotNull(message = "El día es obligatorio.")
     private Day day;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private LocalTime startTime; //no obligatorio
+    private LocalTime endTime; //no obligatorio
+    private boolean active;
 
 }
