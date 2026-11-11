@@ -1,10 +1,7 @@
 package com.acmsoft.checkgo.service.Implement;
 
 import com.acmsoft.checkgo.dto.request.ArrivalLocationRequestDTO;
-import com.acmsoft.checkgo.entity.ArrivalLocation;
-import com.acmsoft.checkgo.entity.ArrivalLocationSchedule;
-import com.acmsoft.checkgo.entity.ArrivalLocationUser;
-import com.acmsoft.checkgo.entity.User;
+import com.acmsoft.checkgo.entity.*;
 import com.acmsoft.checkgo.exception.BadRequestException;
 import com.acmsoft.checkgo.mapper.ArrivalLocationMapper;
 import com.acmsoft.checkgo.repository.ArrivalLocationRepository;
@@ -27,9 +24,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ArrivalLocationService implements IArrivalLocationService {
     private final ArrivalLocationRepository arrivalLocationRepository;
-    private final ArrivalLocationScheduleRepository arrivalLocationScheduleRepository;
-    private final ArrivalLocationUserRepository arrivalLocationUserRepository;
-    private final UserRepository userRepository;
+    private final ArrivalLocationScheduleService arrivalLocationScheduleService;
+    private final ArrivalLocationUserService arrivalLocationUserService;
+    private final ArrivalLocationDayService arrivalLocationDayService;
+    //private final UserRepository userRepository;
     private final UserService userService;
     private final ArrivalLocationMapper arrivalLocationMapper;
     private final GeometryFactory geometryFactory;
@@ -57,33 +55,30 @@ public class ArrivalLocationService implements IArrivalLocationService {
         if (selectedOptions != 1) {
             throw new BadRequestException("Debe seleccionar exactamente un tipo de registro de asistencia, verifique arrivalOnly, exitOnly y arrivalAndDeparture.");
         }
+        ArrivalLocation arrivalLocationsaved = arrivalLocationRepository.save(arrivalLocation);
 
         //Guardamos los horarios seleccionados
-        List<ArrivalLocationSchedule> schedules = arrivalLocationScheduleRepository.findAllByPublicIdIn(toUuids(arrivalLocationRequestDTO.getLocationSchedules()));
-        if (schedules.size() != arrivalLocationRequestDTO.getLocationSchedules().size()) {
-            throw new BadRequestException("Algún horario no existe o los datos enviados son incoherentes");
-        }
-        arrivalLocation.setArrivalLocationSchedules(new HashSet<>(schedules));
-        arrivalLocation.setActive(true);
+        List<ArrivalLocationDay> savedDays = arrivalLocationDayService.savedDays(arrivalLocationRequestDTO.getLocationSchedules(),arrivalLocationsaved);
+        arrivalLocationScheduleService.saveSchedulesDays(arrivalLocationRequestDTO.getLocationSchedules(),savedDays);
 
-        //Guardamos el objeto arrivalLocation para usar su id en la tabla de users manyToMany
-        ArrivalLocation saved = arrivalLocationRepository.save(arrivalLocation);
 
         //Obtenemos los usuarios, verificamos, relacionamos y posteriormente guardamos todos los datos en la tabla manyToMany
         List<UUID> userIds = toUuids(arrivalLocationRequestDTO.getAssignedUsers()).stream().distinct().toList();
-        List<User> users = userRepository.findAllByPublicIdsAndAdmin(userIds, publicIdAdmin);
-        if (users.size() != userIds.size()) {
-            throw new BadRequestException("Uno o más usuarios no existen, no te pertenecen o son incoherentes");
-        }
-        List<ArrivalLocationUser> assignments = users.stream().map(u -> {
-            ArrivalLocationUser alu = new ArrivalLocationUser();
-            alu.setUser(u);
-            alu.setArrivalLocation(saved);
-            return alu;
-        }).toList();
-        arrivalLocationUserRepository.saveAll(assignments);
+        List<User> users = userService.findUsersByCreatedBy(userIds, publicIdAdmin);
+        arrivalLocationUserService.saveArrivalLocationUsers(users,arrivalLocationsaved);
+//        List<User> users = userRepository.findAllByPublicIdsAndAdmin(userIds, publicIdAdmin);
+//        if (users.size() != userIds.size()) {
+//            throw new BadRequestException("Uno o más usuarios no existen, no te pertenecen o son incoherentes");
+//        }
+//        List<ArrivalLocationUser> assignments = users.stream().map(u -> {
+//            ArrivalLocationUser alu = new ArrivalLocationUser();
+//            alu.setUser(u);
+//            alu.setArrivalLocation(arrivalLocationsaved);
+//            return alu;
+//        }).toList();
+//        arrivalLocationUserRepository.saveAll(assignments);
 
-        return saved;
+        return arrivalLocationsaved;
     }
 
     private List<UUID> toUuids(List<String> ids) {

@@ -5,8 +5,6 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 import org.locationtech.jts.geom.Point;
 
@@ -46,13 +44,6 @@ public class ArrivalLocation {
     private int toleranceMinutes;
     @Column(name= "radio_aceptable_meters", nullable = false)
     private int radioAceptableMeters;
-    @ManyToMany
-    @JoinTable(
-            name = "arrival_location_schedules",
-            joinColumns = @JoinColumn(name = "location_id"),
-            inverseJoinColumns = @JoinColumn(name = "schedule_id")
-    )
-    private Set<ArrivalLocationSchedule> arrivalLocationSchedules = new HashSet<>();
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

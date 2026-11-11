@@ -20,7 +20,6 @@ public interface ArrivalLocationMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "location", ignore = true)
     @Mapping(target = "active", ignore = true)
-    @Mapping(target = "arrivalLocationSchedules", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     ArrivalLocation toArrivalLocation(ArrivalLocationRequestDTO requestDTO);

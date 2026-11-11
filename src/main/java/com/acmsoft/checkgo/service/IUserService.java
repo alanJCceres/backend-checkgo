@@ -17,4 +17,5 @@ public interface IUserService {
     void updateAndroidId(DeviceUpdateRequestDTO deviceUpdateRequestDTO, CustomUserDetails userDetails);
     List<UserResponseDTO> getAllUsers(CustomUserDetails userDetails);
     void updateCredentialsUser(UUID publicIdUser, UserUpdateCredentialsRequest userUpdate, CustomUserDetails userDetails);
+    List<User> findUsersByCreatedBy(List<UUID> userIds,UUID publicIdAdmin);
 }

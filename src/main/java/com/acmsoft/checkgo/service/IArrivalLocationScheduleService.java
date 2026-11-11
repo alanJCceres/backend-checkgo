@@ -1,10 +1,10 @@
 package com.acmsoft.checkgo.service;
 
-import com.acmsoft.checkgo.dto.response.ArrivalLocatScheduleResponseDTO;
-import com.acmsoft.checkgo.security.CustomUserDetails;
+import com.acmsoft.checkgo.dto.request.ArrivalLocationDayRequestDto;
+import com.acmsoft.checkgo.entity.ArrivalLocationDay;
 
 import java.util.List;
 
 public interface IArrivalLocationScheduleService {
-    List<ArrivalLocatScheduleResponseDTO> getAllSchedules(CustomUserDetails userDetails);
+    void saveSchedulesDays(List<ArrivalLocationDayRequestDto> request, List<ArrivalLocationDay> savedDays);
 }
