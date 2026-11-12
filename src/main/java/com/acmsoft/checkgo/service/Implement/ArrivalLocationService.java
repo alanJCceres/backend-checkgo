@@ -5,9 +5,6 @@ import com.acmsoft.checkgo.entity.*;
 import com.acmsoft.checkgo.exception.BadRequestException;
 import com.acmsoft.checkgo.mapper.ArrivalLocationMapper;
 import com.acmsoft.checkgo.repository.ArrivalLocationRepository;
-import com.acmsoft.checkgo.repository.ArrivalLocationScheduleRepository;
-import com.acmsoft.checkgo.repository.ArrivalLocationUserRepository;
-import com.acmsoft.checkgo.repository.UserRepository;
 import com.acmsoft.checkgo.security.CustomUserDetails;
 import com.acmsoft.checkgo.service.IArrivalLocationService;
 import jakarta.transaction.Transactional;
@@ -16,7 +13,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,7 +23,6 @@ public class ArrivalLocationService implements IArrivalLocationService {
     private final ArrivalLocationScheduleService arrivalLocationScheduleService;
     private final ArrivalLocationUserService arrivalLocationUserService;
     private final ArrivalLocationDayService arrivalLocationDayService;
-    //private final UserRepository userRepository;
     private final UserService userService;
     private final ArrivalLocationMapper arrivalLocationMapper;
     private final GeometryFactory geometryFactory;
@@ -43,6 +38,7 @@ public class ArrivalLocationService implements IArrivalLocationService {
         UUID publicIdAdmin = userDetails.getPublicId();
         User superAdmin = userService.findUserByPublicId(publicIdAdmin);
         arrivalLocation.setCreatedBy(superAdmin);
+        arrivalLocation.setActive(true);
         double lat = arrivalLocationRequestDTO.getLatitude();
         double lng = arrivalLocationRequestDTO.getLongitude();
         arrivalLocation.setLocation(geometryFactory.createPoint(new Coordinate(lng,lat)));
@@ -61,22 +57,10 @@ public class ArrivalLocationService implements IArrivalLocationService {
         List<ArrivalLocationDay> savedDays = arrivalLocationDayService.savedDays(arrivalLocationRequestDTO.getLocationSchedules(),arrivalLocationsaved);
         arrivalLocationScheduleService.saveSchedulesDays(arrivalLocationRequestDTO.getLocationSchedules(),savedDays);
 
-
         //Obtenemos los usuarios, verificamos, relacionamos y posteriormente guardamos todos los datos en la tabla manyToMany
         List<UUID> userIds = toUuids(arrivalLocationRequestDTO.getAssignedUsers()).stream().distinct().toList();
         List<User> users = userService.findUsersByCreatedBy(userIds, publicIdAdmin);
         arrivalLocationUserService.saveArrivalLocationUsers(users,arrivalLocationsaved);
-//        List<User> users = userRepository.findAllByPublicIdsAndAdmin(userIds, publicIdAdmin);
-//        if (users.size() != userIds.size()) {
-//            throw new BadRequestException("Uno o más usuarios no existen, no te pertenecen o son incoherentes");
-//        }
-//        List<ArrivalLocationUser> assignments = users.stream().map(u -> {
-//            ArrivalLocationUser alu = new ArrivalLocationUser();
-//            alu.setUser(u);
-//            alu.setArrivalLocation(arrivalLocationsaved);
-//            return alu;
-//        }).toList();
-//        arrivalLocationUserRepository.saveAll(assignments);
 
         return arrivalLocationsaved;
     }

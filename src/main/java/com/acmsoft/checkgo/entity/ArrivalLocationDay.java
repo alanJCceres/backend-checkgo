@@ -22,6 +22,7 @@ public class ArrivalLocationDay {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = false)
     private ArrivalLocation arrivalLocation;
+    @Enumerated(EnumType.STRING)
     @Column(name= "day_of_week", nullable = false)
     private Day dayOfWeek;
     @Column(name= "enabled", nullable = false)
@@ -29,5 +30,4 @@ public class ArrivalLocationDay {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
 }
