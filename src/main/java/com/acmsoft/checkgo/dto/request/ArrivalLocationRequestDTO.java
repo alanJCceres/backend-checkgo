@@ -35,11 +35,11 @@ public class ArrivalLocationRequestDTO {
     @Min(value= 0, message = "La tolerancia no puede ser negativo.")
     private int tolerance;
     @NotNull(message = "El radio de la ubicación es obligatorio.")
-    @Min(value= 1, message = "El radio debe ser minimo 1 metro.")
-    @Max(value = 1000,message = "El radio no puede ser mas de 1000 metros.")
+    @Min(value= 20, message = "El radio debe ser minimo 20 metros.")
+    @Max(value = 500,message = "El radio no puede ser mas de 500 metros.")
     private int radio;
     @NotEmpty(message = "Debe tener asignado al menos un horario.")
-    private List<@NotBlank(message = "El horario no puede estar vacío.") String> locationSchedules;
+    private List<ArrivalLocationDayRequestDto> locationSchedules;
     @NotEmpty(message = "Debe tener asignado al menos un usuario.")
     private List<@NotBlank(message = "El usuario no puede estar vacío.") String> assignedUsers;
 }

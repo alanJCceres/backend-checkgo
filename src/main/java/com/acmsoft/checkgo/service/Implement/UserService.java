@@ -105,6 +105,13 @@ public class UserService implements IUserService {
         }
         getUser.setUpdatedBy(superAdmin);
     }
+    public List<User> findUsersByCreatedBy(List<UUID> userIds,UUID publicIdAdmin){
+        List<User> usersFound = userRepository.findAllByPublicIdsAndAdmin(userIds, publicIdAdmin);
+        if (usersFound.size() != userIds.size()) {
+            throw new BadRequestException("Uno o más usuarios no existen, no te pertenecen o son incoherentes");
+        }
+        return usersFound;
+    }
 
     private void validateUserCampos(UserCreateRequestDTO userRequest){
 
