@@ -29,6 +29,7 @@ public class SuperAdminController {
     public ResponseEntity<List<UserResponseDTO>> getAllUsers(@AuthenticationPrincipal CustomUserDetails userDetails){
         return ResponseEntity.ok(userService.getAllUsers(userDetails));
     }
+
     @PatchMapping("/users/{publicIdUser}/credentials")
     public ResponseEntity<Void> updateCredentials(
             @PathVariable UUID publicIdUser,
