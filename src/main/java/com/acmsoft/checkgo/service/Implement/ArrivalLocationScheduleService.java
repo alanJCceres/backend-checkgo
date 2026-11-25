@@ -1,6 +1,7 @@
 package com.acmsoft.checkgo.service.Implement;
 
 import com.acmsoft.checkgo.dto.request.ArrivalLocationDayRequestDto;
+import com.acmsoft.checkgo.dto.response.ArrivalLocationScheduleResponseDto;
 import com.acmsoft.checkgo.entity.ArrivalLocationDay;
 import com.acmsoft.checkgo.entity.ArrivalLocationSchedule;
 import com.acmsoft.checkgo.enums.Day;
@@ -11,6 +12,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -41,5 +43,20 @@ public class ArrivalLocationScheduleService implements IArrivalLocationScheduleS
                 )
                 .toList();
         arrivalLocationScheduleRepository.saveAll(schedules);
+    }
+    public List<ArrivalLocationSchedule> getAllSchedulesDays(List<ArrivalLocationDay> days){
+        return days.isEmpty()
+                ? List.of()
+                : arrivalLocationScheduleRepository.findByArrivalLocationDayIn(days);
+    }
+    public Map<Long, List<ArrivalLocationScheduleResponseDto>> schedulesByDayId(List<ArrivalLocationSchedule> schedules){
+        return schedules.stream()
+                .sorted(Comparator.comparing(
+                        ArrivalLocationSchedule::getStartTime,
+                        Comparator.nullsLast(Comparator.naturalOrder())))
+                .collect(Collectors.groupingBy(
+                        s -> s.getArrivalLocationDay().getDayId(),
+                        Collectors.mapping(arrivalLocationScheduleMapper::toDto, Collectors.toList())
+                ));
     }
 }

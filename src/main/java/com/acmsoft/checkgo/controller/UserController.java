@@ -18,7 +18,6 @@ public class UserController {
 
     @GetMapping("/arrivalLocation")
     public ResponseEntity<List<ArrivalLocationResponseForUserDTO>> getAllArrivalLocations(@AuthenticationPrincipal CustomUserDetails userDetails){
-        //return ResponseEntity.ok(userService.getAllUsers(userDetails));
         return ResponseEntity.ok(arrivalLocationService.getAllArrivalLocationForUser(userDetails));
     }
 }
