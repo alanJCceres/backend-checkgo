@@ -1,6 +1,7 @@
 package com.acmsoft.checkgo.service.Implement;
 
 import com.acmsoft.checkgo.dto.request.ArrivalLocationRequestDTO;
+import com.acmsoft.checkgo.dto.response.ArrivalLocationResponseForUserDTO;
 import com.acmsoft.checkgo.entity.*;
 import com.acmsoft.checkgo.exception.BadRequestException;
 import com.acmsoft.checkgo.mapper.ArrivalLocationMapper;
@@ -63,6 +64,16 @@ public class ArrivalLocationService implements IArrivalLocationService {
         arrivalLocationUserService.saveArrivalLocationUsers(users,arrivalLocationsaved);
 
         return arrivalLocationsaved;
+    }
+
+    public List<ArrivalLocationResponseForUserDTO> getAllArrivalLocationForUser(CustomUserDetails userDetails){
+        if(userDetails == null){
+            throw new BadRequestException("No se puede listar los usuarios sin un access token o con un token expirado/invalido.");
+        }
+        UUID publicIdUser = userDetails.getPublicId();
+        List<ArrivalLocation> arrivalLocations = arrivalLocationUserService.getAllArrivalLocationForUser(publicIdUser);
+
+        return arrivalLocationMapper.toDtoList(arrivalLocations);
     }
 
     private List<UUID> toUuids(List<String> ids) {
