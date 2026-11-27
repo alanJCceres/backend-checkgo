@@ -1,11 +1,10 @@
 package com.acmsoft.checkgo.service.Implement;
 
 import com.acmsoft.checkgo.dto.request.ArrivalLocationDayRequestDto;
-import com.acmsoft.checkgo.dto.response.ArrivalLocationDayResponseDto;
-import com.acmsoft.checkgo.dto.response.ArrivalLocationScheduleResponseDto;
+import com.acmsoft.checkgo.dto.response.ArrivalLocationDayResponseDTO;
+import com.acmsoft.checkgo.dto.response.ArrivalLocationScheduleResponseDTO;
 import com.acmsoft.checkgo.entity.ArrivalLocation;
 import com.acmsoft.checkgo.entity.ArrivalLocationDay;
-import com.acmsoft.checkgo.entity.ArrivalLocationSchedule;
 import com.acmsoft.checkgo.mapper.ArrivalLocationDayMapper;
 import com.acmsoft.checkgo.repository.ArrivalLocationDayRepository;
 import com.acmsoft.checkgo.service.IArrivalLocationDayService;
@@ -41,13 +40,13 @@ public class ArrivalLocationDayService implements IArrivalLocationDayService {
         return arrivalLocationDayRepository.findByArrivalLocationInAndEnabledTrue(arrivalLocations);
     }
 
-    public Map<UUID, List<ArrivalLocationDayResponseDto>> daysByLocation(List<ArrivalLocationDay> days,Map<Long, List<ArrivalLocationScheduleResponseDto>> schedulesByDayId){
+    public Map<UUID, List<ArrivalLocationDayResponseDTO>> daysByLocation(List<ArrivalLocationDay> days, Map<Long, List<ArrivalLocationScheduleResponseDTO>> schedulesByDayId){
         return days.stream()
                 .sorted(Comparator.comparing(ArrivalLocationDay::getDayOfWeek))
                 .collect(Collectors.groupingBy(
                         d -> d.getArrivalLocation().getPublicId(),
                         Collectors.mapping(d -> {
-                            ArrivalLocationDayResponseDto dto = arrivalLocationDayMapper.toDto(d);
+                            ArrivalLocationDayResponseDTO dto = arrivalLocationDayMapper.toDto(d);
                             dto.setIntervalos(schedulesByDayId.getOrDefault(d.getDayId(), List.of()));
                             return dto;
                         }, Collectors.toList())

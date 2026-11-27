@@ -1,8 +1,6 @@
 package com.acmsoft.checkgo.repository;
 
-import com.acmsoft.checkgo.entity.ArrivalLocation;
-import com.acmsoft.checkgo.entity.ArrivalLocationSchedule;
-import com.acmsoft.checkgo.entity.ArrivalLocationUser;
+import com.acmsoft.checkgo.entity.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,4 +20,5 @@ public interface ArrivalLocationUserRepository extends JpaRepository<ArrivalLoca
     List<ArrivalLocation> findAllArrivalLocationsByUserPublicId(
             @Param("publicId") UUID publicId
     );
+    List<ArrivalLocationUser> findByArrivalLocationIn(Collection<ArrivalLocation> locations);
 }

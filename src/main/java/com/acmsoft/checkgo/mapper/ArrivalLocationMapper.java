@@ -1,6 +1,7 @@
 package com.acmsoft.checkgo.mapper;
 
 import com.acmsoft.checkgo.dto.request.ArrivalLocationRequestDTO;
+import com.acmsoft.checkgo.dto.response.ArrivalLocationResponseForAdminDTO;
 import com.acmsoft.checkgo.dto.response.ArrivalLocationResponseForUserDTO;
 import com.acmsoft.checkgo.entity.ArrivalLocation;
 import org.mapstruct.Mapper;
@@ -42,5 +43,20 @@ public interface ArrivalLocationMapper {
     @Mapping(target = "locationSchedules", ignore = true)
     ArrivalLocationResponseForUserDTO toDto(ArrivalLocation arrivalLocation);
 
+    @Mapping(target = "publicId", source = "arrivalLocation.publicId")
+    @Mapping(target = "locationName", source = "arrivalLocation.locationName")
+    @Mapping(target = "address", source = "arrivalLocation.address")
+    @Mapping(target = "tolerance", source = "arrivalLocation.toleranceMinutes")
+    @Mapping(target = "radio", source = "arrivalLocation.radioAceptableMeters")
+    @Mapping(target = "arrivalOnly", source = "arrivalLocation.arrivalOnly")
+    @Mapping(target = "exitOnly", source = "arrivalLocation.exitOnly")
+    @Mapping(target = "arrivalAndDeparture", source = "arrivalLocation.arrivalAndDeparture")
+    @Mapping(target = "latitude", expression = "java(arrivalLocation.getLocation().getY())")
+    @Mapping(target = "longitude", expression = "java(arrivalLocation.getLocation().getX())")
+    @Mapping(target = "locationSchedules", ignore = true)
+    @Mapping(target = "assignedUsers", ignore = true)
+    ArrivalLocationResponseForAdminDTO toAdminDto(ArrivalLocation arrivalLocation);
+
     List<ArrivalLocationResponseForUserDTO> toDtoList(List<ArrivalLocation> arrivalLocations);
+    List<ArrivalLocationResponseForAdminDTO> toAdminDtoList(List<ArrivalLocation> arrivalLocations);
 }

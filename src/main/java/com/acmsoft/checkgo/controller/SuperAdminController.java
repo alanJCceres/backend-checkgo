@@ -2,6 +2,8 @@ package com.acmsoft.checkgo.controller;
 
 import com.acmsoft.checkgo.dto.request.ArrivalLocationRequestDTO;
 import com.acmsoft.checkgo.dto.request.UserUpdateCredentialsRequest;
+import com.acmsoft.checkgo.dto.response.ArrivalLocationResponseForAdminDTO;
+import com.acmsoft.checkgo.dto.response.ArrivalLocationResponseForUserDTO;
 import com.acmsoft.checkgo.dto.response.UserResponseDTO;
 import com.acmsoft.checkgo.entity.ArrivalLocation;
 import com.acmsoft.checkgo.security.CustomUserDetails;
@@ -49,5 +51,9 @@ public class SuperAdminController {
         ArrivalLocation newArrivalLocation = arrivalLocationService.saveArrivalLocation(arrivalLocationRequestDTO,userDetails);
         URI uri = uriBuilder.path("/api/v1/super_admin/arrivalLocation/{id}").buildAndExpand(newArrivalLocation.getPublicId()).toUri();
         return ResponseEntity.created(uri).build();
+    }
+    @GetMapping("/arrivalLocation")
+    public ResponseEntity<List<ArrivalLocationResponseForAdminDTO>> getAllArrivalLocations(@AuthenticationPrincipal CustomUserDetails userDetails){
+        return ResponseEntity.ok(arrivalLocationService.getAllArrivalLocationForAdmin(userDetails));
     }
 }

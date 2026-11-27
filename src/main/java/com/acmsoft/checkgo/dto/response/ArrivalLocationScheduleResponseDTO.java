@@ -11,7 +11,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ArrivalLocationScheduleResponseDto {
+public class ArrivalLocationScheduleResponseDTO {
     private LocalTime startTime;
     private LocalTime endTime;
 }

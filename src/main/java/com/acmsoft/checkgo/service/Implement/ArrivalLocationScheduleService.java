@@ -1,7 +1,7 @@
 package com.acmsoft.checkgo.service.Implement;
 
 import com.acmsoft.checkgo.dto.request.ArrivalLocationDayRequestDto;
-import com.acmsoft.checkgo.dto.response.ArrivalLocationScheduleResponseDto;
+import com.acmsoft.checkgo.dto.response.ArrivalLocationScheduleResponseDTO;
 import com.acmsoft.checkgo.entity.ArrivalLocationDay;
 import com.acmsoft.checkgo.entity.ArrivalLocationSchedule;
 import com.acmsoft.checkgo.enums.Day;
@@ -49,7 +49,7 @@ public class ArrivalLocationScheduleService implements IArrivalLocationScheduleS
                 ? List.of()
                 : arrivalLocationScheduleRepository.findByArrivalLocationDayIn(days);
     }
-    public Map<Long, List<ArrivalLocationScheduleResponseDto>> schedulesByDayId(List<ArrivalLocationSchedule> schedules){
+    public Map<Long, List<ArrivalLocationScheduleResponseDTO>> schedulesByDayId(List<ArrivalLocationSchedule> schedules){
         return schedules.stream()
                 .sorted(Comparator.comparing(
                         ArrivalLocationSchedule::getStartTime,

@@ -1,7 +1,7 @@
 package com.acmsoft.checkgo.mapper;
 
 import com.acmsoft.checkgo.dto.request.ArrivalLocationDayRequestDto;
-import com.acmsoft.checkgo.dto.response.ArrivalLocationDayResponseDto;
+import com.acmsoft.checkgo.dto.response.ArrivalLocationDayResponseDTO;
 import com.acmsoft.checkgo.entity.ArrivalLocationDay;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -21,7 +21,7 @@ public interface ArrivalLocationDayMapper {
     @Mapping(target = "day", source = "arrivalLocationDay.dayOfWeek")
     @Mapping(target = "enabled", source = "arrivalLocationDay.enabled")
     @Mapping(target = "intervalos", ignore = true)
-    ArrivalLocationDayResponseDto toDto(ArrivalLocationDay arrivalLocationDay);
+    ArrivalLocationDayResponseDTO toDto(ArrivalLocationDay arrivalLocationDay);
 
-    List<ArrivalLocationDayResponseDto> toDtoList(List<ArrivalLocationDay> arrivalLocationDays);
+    List<ArrivalLocationDayResponseDTO> toDtoList(List<ArrivalLocationDay> arrivalLocationDays);
 }

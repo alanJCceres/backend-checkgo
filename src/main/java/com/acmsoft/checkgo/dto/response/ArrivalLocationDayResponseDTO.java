@@ -12,8 +12,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ArrivalLocationDayResponseDto {
+public class ArrivalLocationDayResponseDTO {
     private Day day;
     private boolean enabled;
-    private List<ArrivalLocationScheduleResponseDto> intervalos;
+    private List<ArrivalLocationScheduleResponseDTO> intervalos;
 }

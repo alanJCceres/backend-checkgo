@@ -24,5 +24,5 @@ public class ArrivalLocationResponseForUserDTO {
     private int tolerance;
     private int radio;
     private String createdBy;
-    private List<ArrivalLocationDayResponseDto> locationSchedules;
+    private List<ArrivalLocationDayResponseDTO> locationSchedules;
 }

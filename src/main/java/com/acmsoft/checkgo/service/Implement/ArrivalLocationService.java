@@ -1,9 +1,7 @@
 package com.acmsoft.checkgo.service.Implement;
 
 import com.acmsoft.checkgo.dto.request.ArrivalLocationRequestDTO;
-import com.acmsoft.checkgo.dto.response.ArrivalLocationDayResponseDto;
-import com.acmsoft.checkgo.dto.response.ArrivalLocationResponseForUserDTO;
-import com.acmsoft.checkgo.dto.response.ArrivalLocationScheduleResponseDto;
+import com.acmsoft.checkgo.dto.response.*;
 import com.acmsoft.checkgo.entity.*;
 import com.acmsoft.checkgo.exception.BadRequestException;
 import com.acmsoft.checkgo.mapper.ArrivalLocationMapper;
@@ -16,6 +14,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -84,13 +83,39 @@ public class ArrivalLocationService implements IArrivalLocationService {
         List<ArrivalLocationDay> days = arrivalLocationDayService.getDaysEnabled(arrivalLocations);
         List<ArrivalLocationSchedule> schedules = arrivalLocationScheduleService.getAllSchedulesDays(days);
         //intervalos ordenados por hora de inicio
-        Map<Long, List<ArrivalLocationScheduleResponseDto>> schedulesByDayId = arrivalLocationScheduleService.schedulesByDayId(schedules);
+        Map<Long, List<ArrivalLocationScheduleResponseDTO>> schedulesByDayId = arrivalLocationScheduleService.schedulesByDayId(schedules);
         //días ordenados (con sus intervalos)
-        Map<UUID, List<ArrivalLocationDayResponseDto>> daysByLocation = arrivalLocationDayService.daysByLocation(days,schedulesByDayId);
+        Map<UUID, List<ArrivalLocationDayResponseDTO>> daysByLocation = arrivalLocationDayService.daysByLocation(days,schedulesByDayId);
 
         response.forEach(dto ->
                 dto.setLocationSchedules(daysByLocation.getOrDefault(dto.getPublicId(), List.of())));
 
+        return response;
+    }
+    public List<ArrivalLocationResponseForAdminDTO> getAllArrivalLocationForAdmin(CustomUserDetails userDetails){
+        if(userDetails == null){
+            throw new BadRequestException("No se puede listar los usuarios sin un access token o con un token expirado/invalido.");
+        }
+        UUID publicIdAdmin = userDetails.getPublicId();
+        List<ArrivalLocation> arrivalLocations = arrivalLocationRepository.findByCreatedBy_publicId(publicIdAdmin);
+        List<ArrivalLocationResponseForAdminDTO> response = arrivalLocationMapper.toAdminDtoList(arrivalLocations);
+        if (arrivalLocations.isEmpty()) {
+            return response;
+        }
+
+        List<ArrivalLocationDay> days = arrivalLocationDayService.getDaysEnabled(arrivalLocations);
+        List<ArrivalLocationSchedule> schedules = arrivalLocationScheduleService.getAllSchedulesDays(days);
+        Map<Long, List<ArrivalLocationScheduleResponseDTO>> schedulesByDayId = arrivalLocationScheduleService.schedulesByDayId(schedules);
+        Map<UUID, List<ArrivalLocationDayResponseDTO>> daysByLocation = arrivalLocationDayService.daysByLocation(days,schedulesByDayId);
+
+        response.forEach(dto ->
+                dto.setLocationSchedules(daysByLocation.getOrDefault(dto.getPublicId(), List.of())));
+
+        List<ArrivalLocationUser> arrivalLocationUser = arrivalLocationUserService.getAllArrivalLocationUser(arrivalLocations);
+        Map<UUID, List<UserResponseDTO>> usersByLocation = arrivalLocationUserService.usersByLocation(arrivalLocationUser);
+
+        response.forEach(dto ->
+                dto.setAssignedUsers(usersByLocation.getOrDefault(dto.getPublicId(), Collections.emptyList())));
         return response;
     }
 
