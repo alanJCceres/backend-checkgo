@@ -2,10 +2,12 @@ package com.acmsoft.checkgo.service.Implement;
 
 import com.acmsoft.checkgo.dto.request.ArrivalLocationDayRequestDto;
 import com.acmsoft.checkgo.dto.response.ArrivalLocationScheduleResponseDTO;
+import com.acmsoft.checkgo.entity.ArrivalLocation;
 import com.acmsoft.checkgo.entity.ArrivalLocationDay;
 import com.acmsoft.checkgo.entity.ArrivalLocationSchedule;
 import com.acmsoft.checkgo.enums.Day;
 import com.acmsoft.checkgo.mapper.ArrivalLocationScheduleMapper;
+import com.acmsoft.checkgo.repository.ArrivalLocationDayRepository;
 import com.acmsoft.checkgo.repository.ArrivalLocationScheduleRepository;
 import com.acmsoft.checkgo.service.IArrivalLocationScheduleService;
 import jakarta.transaction.Transactional;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ArrivalLocationScheduleService implements IArrivalLocationScheduleService {
     private final ArrivalLocationScheduleRepository arrivalLocationScheduleRepository;
+    private final ArrivalLocationDayRepository arrivalLocationDayRepository;
     private final ArrivalLocationScheduleMapper arrivalLocationScheduleMapper;
 
     @Transactional
@@ -44,12 +47,16 @@ public class ArrivalLocationScheduleService implements IArrivalLocationScheduleS
                 .toList();
         arrivalLocationScheduleRepository.saveAll(schedules);
     }
-    public List<ArrivalLocationSchedule> getAllSchedulesDays(List<ArrivalLocationDay> days){
+
+    public List<ArrivalLocationSchedule> getAllSchedulesDays(List<ArrivalLocation> arrivalLocations){
+        List<ArrivalLocationDay> days = arrivalLocationDayRepository.findByArrivalLocationInAndEnabledTrue(arrivalLocations);
         return days.isEmpty()
                 ? List.of()
                 : arrivalLocationScheduleRepository.findByArrivalLocationDayIn(days);
     }
-    public Map<Long, List<ArrivalLocationScheduleResponseDTO>> schedulesByDayId(List<ArrivalLocationSchedule> schedules){
+
+    public Map<Long, List<ArrivalLocationScheduleResponseDTO>> schedulesByDayId(List<ArrivalLocation> arrivalLocations){
+        List<ArrivalLocationSchedule> schedules = getAllSchedulesDays(arrivalLocations);
         return schedules.stream()
                 .sorted(Comparator.comparing(
                         ArrivalLocationSchedule::getStartTime,

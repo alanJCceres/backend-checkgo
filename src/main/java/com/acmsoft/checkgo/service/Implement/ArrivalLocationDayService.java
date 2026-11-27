@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class ArrivalLocationDayService implements IArrivalLocationDayService {
     private final ArrivalLocationDayRepository arrivalLocationDayRepository;
     private final ArrivalLocationDayMapper arrivalLocationDayMapper;
+    private final ArrivalLocationScheduleService arrivalLocationScheduleService;
 
     @Transactional
     public List<ArrivalLocationDay> savedDays(List<ArrivalLocationDayRequestDto> request, ArrivalLocation arrivalLocation){
@@ -36,11 +37,10 @@ public class ArrivalLocationDayService implements IArrivalLocationDayService {
         return arrivalLocationDayRepository.saveAll(days);
     }
 
-    public List<ArrivalLocationDay> getDaysEnabled(List<ArrivalLocation> arrivalLocations){
-        return arrivalLocationDayRepository.findByArrivalLocationInAndEnabledTrue(arrivalLocations);
-    }
+    public Map<UUID, List<ArrivalLocationDayResponseDTO>> daysByLocation(List<ArrivalLocation> arrivalLocations){
+        List<ArrivalLocationDay> days = arrivalLocationDayRepository.findByArrivalLocationInAndEnabledTrue(arrivalLocations);
+        Map<Long, List<ArrivalLocationScheduleResponseDTO>> schedulesByDayId = arrivalLocationScheduleService.schedulesByDayId(arrivalLocations);
 
-    public Map<UUID, List<ArrivalLocationDayResponseDTO>> daysByLocation(List<ArrivalLocationDay> days, Map<Long, List<ArrivalLocationScheduleResponseDTO>> schedulesByDayId){
         return days.stream()
                 .sorted(Comparator.comparing(ArrivalLocationDay::getDayOfWeek))
                 .collect(Collectors.groupingBy(

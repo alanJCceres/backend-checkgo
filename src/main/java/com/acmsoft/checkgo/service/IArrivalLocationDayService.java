@@ -12,6 +12,5 @@ import java.util.UUID;
 
 public interface IArrivalLocationDayService {
     List<ArrivalLocationDay> savedDays(List<ArrivalLocationDayRequestDto> request, ArrivalLocation arrivalLocation);
-    List<ArrivalLocationDay> getDaysEnabled(List<ArrivalLocation> arrivalLocations);
-    Map<UUID, List<ArrivalLocationDayResponseDTO>> daysByLocation(List<ArrivalLocationDay> days, Map<Long, List<ArrivalLocationScheduleResponseDTO>> schedulesByDayId);
+    Map<UUID, List<ArrivalLocationDayResponseDTO>> daysByLocation(List<ArrivalLocation> arrivalLocations);
 }

@@ -33,13 +33,18 @@ public class ArrivalLocationUserService implements IArrivalLocationUserService {
         }).toList();
         arrivalLocationUserRepository.saveAll(assignments);
     }
+
     public List<ArrivalLocation> getAllArrivalLocationForUser(UUID publicIdUser){
         return arrivalLocationUserRepository.findAllArrivalLocationsByUserPublicId(publicIdUser);
     }
+
     public List<ArrivalLocationUser> getAllArrivalLocationUser(List<ArrivalLocation> locations){
         return arrivalLocationUserRepository.findByArrivalLocationIn(locations);
     }
-    public Map<UUID, List<UserResponseDTO>> usersByLocation(List<ArrivalLocationUser> relations){
+
+    public Map<UUID, List<UserResponseDTO>> usersByLocation(List<ArrivalLocation> locations){
+        List<ArrivalLocationUser> relations = getAllArrivalLocationUser(locations);
+
         return relations.stream()
                 .collect(Collectors.groupingBy(
                         relation -> relation.getArrivalLocation().getPublicId(),

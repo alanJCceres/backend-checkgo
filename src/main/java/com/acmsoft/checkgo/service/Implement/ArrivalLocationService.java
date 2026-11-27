@@ -73,49 +73,41 @@ public class ArrivalLocationService implements IArrivalLocationService {
             throw new BadRequestException("No se puede listar los usuarios sin un access token o con un token expirado/invalido.");
         }
         UUID publicIdUser = userDetails.getPublicId();
-        List<ArrivalLocation> arrivalLocations = arrivalLocationUserService.getAllArrivalLocationForUser(publicIdUser);
 
+        List<ArrivalLocation> arrivalLocations = arrivalLocationUserService.getAllArrivalLocationForUser(publicIdUser);
         List<ArrivalLocationResponseForUserDTO> response = arrivalLocationMapper.toDtoList(arrivalLocations);
         if (arrivalLocations.isEmpty()) {
             return response;
         }
 
-        List<ArrivalLocationDay> days = arrivalLocationDayService.getDaysEnabled(arrivalLocations);
-        List<ArrivalLocationSchedule> schedules = arrivalLocationScheduleService.getAllSchedulesDays(days);
-        //intervalos ordenados por hora de inicio
-        Map<Long, List<ArrivalLocationScheduleResponseDTO>> schedulesByDayId = arrivalLocationScheduleService.schedulesByDayId(schedules);
-        //días ordenados (con sus intervalos)
-        Map<UUID, List<ArrivalLocationDayResponseDTO>> daysByLocation = arrivalLocationDayService.daysByLocation(days,schedulesByDayId);
-
+        //obtiene los dias por ubicacion
+        Map<UUID, List<ArrivalLocationDayResponseDTO>> daysByLocation = arrivalLocationDayService.daysByLocation(arrivalLocations);
         response.forEach(dto ->
                 dto.setLocationSchedules(daysByLocation.getOrDefault(dto.getPublicId(), List.of())));
 
         return response;
     }
+
     public List<ArrivalLocationResponseForAdminDTO> getAllArrivalLocationForAdmin(CustomUserDetails userDetails){
         if(userDetails == null){
             throw new BadRequestException("No se puede listar los usuarios sin un access token o con un token expirado/invalido.");
         }
         UUID publicIdAdmin = userDetails.getPublicId();
+
         List<ArrivalLocation> arrivalLocations = arrivalLocationRepository.findByCreatedBy_publicId(publicIdAdmin);
         List<ArrivalLocationResponseForAdminDTO> response = arrivalLocationMapper.toAdminDtoList(arrivalLocations);
         if (arrivalLocations.isEmpty()) {
             return response;
         }
 
-        List<ArrivalLocationDay> days = arrivalLocationDayService.getDaysEnabled(arrivalLocations);
-        List<ArrivalLocationSchedule> schedules = arrivalLocationScheduleService.getAllSchedulesDays(days);
-        Map<Long, List<ArrivalLocationScheduleResponseDTO>> schedulesByDayId = arrivalLocationScheduleService.schedulesByDayId(schedules);
-        Map<UUID, List<ArrivalLocationDayResponseDTO>> daysByLocation = arrivalLocationDayService.daysByLocation(days,schedulesByDayId);
+        Map<UUID, List<ArrivalLocationDayResponseDTO>> daysByLocation = arrivalLocationDayService.daysByLocation(arrivalLocations);
+        Map<UUID, List<UserResponseDTO>> usersByLocation = arrivalLocationUserService.usersByLocation(arrivalLocations);
 
         response.forEach(dto ->
                 dto.setLocationSchedules(daysByLocation.getOrDefault(dto.getPublicId(), List.of())));
-
-        List<ArrivalLocationUser> arrivalLocationUser = arrivalLocationUserService.getAllArrivalLocationUser(arrivalLocations);
-        Map<UUID, List<UserResponseDTO>> usersByLocation = arrivalLocationUserService.usersByLocation(arrivalLocationUser);
-
         response.forEach(dto ->
                 dto.setAssignedUsers(usersByLocation.getOrDefault(dto.getPublicId(), Collections.emptyList())));
+
         return response;
     }
 
