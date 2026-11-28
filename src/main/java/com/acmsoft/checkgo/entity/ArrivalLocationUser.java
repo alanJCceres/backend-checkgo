@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,5 +27,5 @@ public class ArrivalLocationUser {
     private ArrivalLocation arrivalLocation;
     @CreationTimestamp
     @Column(name = "assignment_date", nullable = false, updatable = false)
-    private LocalDateTime assignmentDate;
+    private Instant assignmentDate;
 }

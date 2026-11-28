@@ -1,6 +1,6 @@
 package com.acmsoft.checkgo.mapper;
 
-import com.acmsoft.checkgo.dto.request.ArrivalLocationScheduleRequestDto;
+import com.acmsoft.checkgo.dto.request.ArrivalLocationScheduleRequestDTO;
 import com.acmsoft.checkgo.dto.response.ArrivalLocationScheduleResponseDTO;
 import com.acmsoft.checkgo.entity.ArrivalLocationSchedule;
 import org.mapstruct.Mapper;
@@ -16,11 +16,11 @@ public interface ArrivalLocationScheduleMapper {
     @Mapping(target = "scheduleId", ignore = true)
     @Mapping(target = "arrivalLocationDay", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    ArrivalLocationSchedule toEntity(ArrivalLocationScheduleRequestDto arrivalLocationScheduleRequestDto);
+    ArrivalLocationSchedule toEntity(ArrivalLocationScheduleRequestDTO arrivalLocationScheduleRequestDto);
 
     @Mapping(target = "startTime", source = "arrivalLocationSchedule.startTime")
     @Mapping(target = "endTime", source = "arrivalLocationSchedule.endTime")
     ArrivalLocationScheduleResponseDTO toDto(ArrivalLocationSchedule arrivalLocationSchedule);
 
-    List<ArrivalLocationScheduleRequestDto> toDtoList(List<ArrivalLocationSchedule> arrivalLocationSchedules);
+    List<ArrivalLocationScheduleRequestDTO> toDtoList(List<ArrivalLocationSchedule> arrivalLocationSchedules);
 }

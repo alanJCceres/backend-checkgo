@@ -14,10 +14,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ArrivalLocationDayRequestDto {
+public class ArrivalLocationDayRequestDTO {
     @NotEmpty(message = "Debe tener asignado un día de la semana.")
     private Day day;
     @NotNull(message = "el campo enabled es obligatorio.")
     private boolean enabled;
-    private List<ArrivalLocationScheduleRequestDto> intervalos;
+    private List<ArrivalLocationScheduleRequestDTO> intervalos;
 }

@@ -4,8 +4,11 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import org.hibernate.annotations.UpdateTimestamp;
 import org.locationtech.jts.geom.Point;
 
 @Entity
@@ -28,7 +31,7 @@ public class ArrivalLocation {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "createdBy", nullable = false)
     private User createdBy;
-    @Column(name= "address", nullable = false)
+    @Column(name= "address")
     private String address;
     @Column(name="location",columnDefinition = "geography(Point,4326)")
     private Point location;
@@ -46,8 +49,8 @@ public class ArrivalLocation {
     private int radioAceptableMeters;
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-    @CreationTimestamp
-    @Column(name = "updated_at", nullable = false, updatable = false)
-    private LocalDateTime updatedAt;
+    private Instant createdAt;
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
 }

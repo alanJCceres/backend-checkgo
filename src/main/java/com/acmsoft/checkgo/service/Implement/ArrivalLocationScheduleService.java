@@ -1,6 +1,6 @@
 package com.acmsoft.checkgo.service.Implement;
 
-import com.acmsoft.checkgo.dto.request.ArrivalLocationDayRequestDto;
+import com.acmsoft.checkgo.dto.request.ArrivalLocationDayRequestDTO;
 import com.acmsoft.checkgo.dto.response.ArrivalLocationScheduleResponseDTO;
 import com.acmsoft.checkgo.entity.ArrivalLocation;
 import com.acmsoft.checkgo.entity.ArrivalLocationDay;
@@ -28,7 +28,7 @@ public class ArrivalLocationScheduleService implements IArrivalLocationScheduleS
     private final ArrivalLocationScheduleMapper arrivalLocationScheduleMapper;
 
     @Transactional
-    public void saveSchedulesDays(List<ArrivalLocationDayRequestDto> request, List<ArrivalLocationDay> savedDays){
+    public void saveSchedulesDays(List<ArrivalLocationDayRequestDTO> request, List<ArrivalLocationDay> savedDays){
 
         Map<Day, ArrivalLocationDay> daysMap = savedDays.stream()
                 .collect(Collectors.toMap(
